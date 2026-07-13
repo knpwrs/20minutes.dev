@@ -1,0 +1,64 @@
+---
+// Sticky top navigation ported from the design. Reused across pages via props.
+interface Props {
+	logoHref?: string;
+	projectsHref?: string;
+	active?: 'projects' | 'about' | null;
+	ctaLabel?: string;
+	ctaHref?: string;
+	/** Mark the CTA as a resume link so the progress script keeps its label/href
+	 *  (Start → Continue → Review) in sync with localStorage. */
+	ctaTracked?: boolean;
+}
+
+const {
+	logoHref = '/',
+	projectsHref = '/projects',
+	active = null,
+	ctaLabel = 'Start',
+	ctaHref = '/projects',
+	ctaTracked = false,
+} = Astro.props;
+---
+
+<nav
+	class="sticky top-0 z-50 border-b border-white/8 bg-ink/80 backdrop-blur-[10px] backdrop-saturate-[1.2]"
+>
+	<div
+		class="mx-auto flex max-w-[1180px] items-center justify-between px-[clamp(20px,5vw,40px)] py-4"
+	>
+		<a
+			href={logoHref}
+			class="font-mono text-[15px] font-semibold tracking-[-0.02em] text-fg hover:text-fg"
+		>
+			20minutes<span class="text-accent">.dev</span>
+		</a>
+		<div class="flex items-center gap-[clamp(18px,3vw,32px)]">
+			<a
+				href={projectsHref}
+				class:list={[
+					'hidden font-display text-[14.5px] font-medium transition-colors hover:text-fg sm:inline',
+					active === 'projects' ? 'text-fg' : 'text-muted-2',
+				]}
+			>
+				Projects
+			</a>
+			<a
+				href="/about"
+				class:list={[
+					'hidden font-display text-[14.5px] font-medium transition-colors hover:text-fg sm:inline',
+					active === 'about' ? 'text-fg' : 'text-muted-2',
+				]}
+			>
+				About
+			</a>
+			<a
+				href={ctaHref}
+				data-continue={ctaTracked ? '' : undefined}
+				class="rounded-btn bg-accent px-4 py-[9px] font-display text-[14px] font-semibold text-ink transition duration-150 hover:-translate-y-px hover:shadow-[0_6px_18px_rgba(110,155,222,.3)]"
+			>
+				{ctaLabel}
+			</a>
+		</div>
+	</div>
+</nav>

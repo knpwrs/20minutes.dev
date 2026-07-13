@@ -1,0 +1,232 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import Syllabus from '../../components/Syllabus.astro';
+import LessonReader from '../../components/LessonReader.astro';
+import { chapterOf, type Project } from '../../data/projects';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('projects');
+	return entries.map((entry) => ({
+		params: { slug: entry.id },
+		props: { project: { ...entry.data, slug: entry.id } as Project },
+	}));
+}
+
+const { project } = Astro.props as { project: Project };
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// Lessons authored for this project, ascending by lesson number.
+const lessons = (await getCollection('lessons'))
+	.filter((l) => l.data.project === project.slug)
+	.sort((a, b) => a.data.lesson - b.data.lesson);
+const syllabusLessons = lessons.map((l) => ({
+	lesson: l.data.lesson,
+	title: l.data.title,
+	chapter: chapterOf(l.id, project.parts),
+}));
+
+const toLink = (l: (typeof lessons)[number]) => ({
+	lesson: l.data.lesson,
+	title: l.data.title,
+	href: `/projects/${project.slug}/lesson-${pad(l.data.lesson)}`,
+});
+
+// The overview reader previews the project from its first lesson.
+const readerLesson = lessons[0] ?? null;
+const readerChapter = readerLesson ? chapterOf(readerLesson.id, project.parts) : '';
+const prev = null;
+const next = readerLesson && lessons.length > 1 ? toLink(lessons[1]) : null;
+
+const rendered = readerLesson ? await render(readerLesson) : null;
+const Content = rendered?.Content;
+const l = readerLesson?.data;
+
+// Progress is client-only (localStorage), so the server renders a neutral,
+// no-progress card: 0% bar, nothing completed, a "Start" button pointing at the
+// first authored lesson. The client script (src/scripts/progress.ts) rewrites the
+// bar, count, and resume-link label (Start → Continue → Review) from the visitor's
+// saved progress on load.
+const continueLesson = readerLesson?.data.lesson ?? null;
+const continueHref = continueLesson ? `/projects/${project.slug}/lesson-${pad(continueLesson)}` : '#';
+---
+
+<Layout title={`${project.title} - 20minutes.dev`} description={project.blurb}>
+	<div class="flex min-h-screen w-full flex-col overflow-x-hidden">
+		<Nav active="projects" ctaLabel="Start" ctaHref={continueHref} ctaTracked />
+
+		<!-- ===== PROJECT HEADER ===== -->
+		<header
+			class="mx-auto w-full max-w-295 px-[clamp(20px,5vw,40px)] pt-[clamp(36px,5vw,56px)] pb-2"
+		>
+			<div class="mb-5.5 font-mono text-[12.5px] text-dim">
+				<a href="/projects" class="text-dim hover:text-muted">Projects</a>
+				<span class="text-[#565961]">/</span>
+				<span class="text-muted">{project.title}</span>
+			</div>
+
+			<div>
+				<h1
+					class="mb-4 font-display text-[clamp(32px,5vw,48px)] font-semibold leading-[1.04] tracking-[-0.03em] text-fg"
+				>
+					{project.title}
+				</h1>
+				<p class="mb-5.5 text-[clamp(15px,1.8vw,17px)] leading-[1.6] text-muted">
+					{project.blurb}
+				</p>
+				<div class="flex flex-wrap gap-2">
+					<span class="rounded-md border border-white/13 px-2.5 py-1 font-mono text-xs text-dim">
+						{project.lessons} lessons
+					</span>
+					<span
+						class="rounded-md border border-accent/30 bg-accent/8 px-2.5 py-1 font-mono text-xs text-accent"
+					>
+						{project.size}
+					</span>
+					<span class="rounded-md border border-white/13 px-2.5 py-1 font-mono text-xs text-dim">
+						~{project.estMin} min / lesson
+					</span>
+					{
+						project.tech.map((t) => (
+							<span class="rounded-md bg-chip px-2.5 py-1 font-mono text-xs text-dim">{t}</span>
+						))
+					}
+				</div>
+			</div>
+		</header>
+
+		{
+			project.overview && (
+				<section class="mx-auto w-full max-w-295 px-[clamp(20px,5vw,40px)] pt-[clamp(30px,4vw,48px)] pb-2">
+					<div class="mb-3 font-mono text-xs uppercase tracking-[0.14em] text-accent">
+						The project
+					</div>
+					<h2 class="mb-4 font-display text-[clamp(22px,3vw,30px)] font-semibold tracking-tight text-fg">
+						What you'll build over the next {project.lessons} lessons
+					</h2>
+					<div class="flex flex-col gap-4 text-[clamp(15px,1.8vw,17px)] leading-[1.65] text-muted">
+						{project.overview.split('\n\n').map((para) => (
+							<p>{para}</p>
+						))}
+					</div>
+				</section>
+			)
+		}
+
+		<!-- ===== SPLIT: SYLLABUS + READER ===== -->
+		<section class="mx-auto w-full max-w-295 px-[clamp(20px,5vw,40px)] pt-11 pb-22.5">
+			<div
+				class="grid grid-cols-1 items-start gap-[clamp(28px,3.5vw,52px)] min-[920px]:grid-cols-[300px_1fr]"
+			>
+				<Syllabus
+					project={project}
+					slug={project.slug}
+					lessons={syllabusLessons}
+					activeLesson={readerLesson?.data.lesson ?? null}
+				/>
+
+				<div id="reader" class="min-w-0 scroll-mt-22">
+					{
+						l && Content ? (
+							<LessonReader
+								slug={project.slug}
+								lesson={l.lesson}
+								chapter={readerChapter}
+								title={l.title}
+								overview={l.overview}
+								goal={l.goal}
+								spec={l.spec}
+								code={l.code}
+								reading={l.reading}
+								checkpoint={l.checkpoint}
+								prev={prev}
+								next={next}
+							>
+								<Content />
+							</LessonReader>
+						) : (
+							<div class="rounded-card border border-white/10 bg-surface px-6 py-10 text-center font-mono text-sm text-faint">
+								Lessons for this project are coming soon.
+							</div>
+						)
+					}
+				</div>
+			</div>
+		</section>
+
+		{
+			project.caveats && (
+				<section class="mx-auto w-full max-w-295 px-[clamp(20px,5vw,40px)] pb-22.5">
+					<div class="rounded-card border border-white/10 bg-surface p-[clamp(24px,3vw,36px)]">
+						<div class="mb-3 font-mono text-xs uppercase tracking-[0.14em] text-accent">
+							Scope &amp; extensions
+						</div>
+						<h2 class="mb-4 font-display text-[clamp(22px,3vw,28px)] font-semibold tracking-tight text-fg">
+							Where this project stops - and where to go next
+						</h2>
+						{project.caveats.note && (
+							<p class="mb-6 max-w-170 text-[15px] leading-[1.6] text-muted">
+								{project.caveats.note}
+							</p>
+						)}
+						<div class="mb-2.5 font-mono text-[11.5px] uppercase tracking-[0.13em] text-faint">
+							Extend it next
+						</div>
+						<ul class="flex flex-col gap-2.5">
+							{project.caveats.future.map((item) => (
+								<li class="flex gap-3 text-sm leading-[1.55] text-muted">
+									<span
+										class="mt-1.75 h-1.5 w-1.5 flex-none rounded-full bg-accent/70"
+										aria-hidden="true"
+									/>
+									<span>{item}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				</section>
+			)
+		}
+
+		{
+			project.resources && project.resources.length > 0 && (
+				<section class="mx-auto w-full max-w-295 px-[clamp(20px,5vw,40px)] pb-22.5">
+					<div class="rounded-card border border-white/10 bg-surface p-[clamp(24px,3vw,36px)]">
+						<div class="mb-3 font-mono text-xs uppercase tracking-[0.14em] text-accent">
+							Recommended reading
+						</div>
+						<h2 class="mb-5 font-display text-[clamp(22px,3vw,28px)] font-semibold tracking-tight text-fg">
+							Books &amp; references that go deeper
+						</h2>
+						<ul class="flex flex-col gap-4">
+							{project.resources.map((r) => (
+								<li class="border-l-2 border-white/10 pl-4">
+									<div class="text-[15px] font-semibold text-fg">
+										{r.url ? (
+											<a
+												href={r.url}
+												target="_blank"
+												rel="noopener"
+												class="transition-colors hover:text-accent"
+											>
+												{r.title}
+											</a>
+										) : (
+											r.title
+										)}
+										{r.author && <span class="font-normal text-dim"> · {r.author}</span>}
+									</div>
+									{r.note && <p class="mt-1 text-sm leading-[1.55] text-muted">{r.note}</p>}
+								</li>
+							))}
+						</ul>
+					</div>
+				</section>
+			)
+		}
+
+		<Footer />
+	</div>
+</Layout>

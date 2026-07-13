@@ -1,0 +1,83 @@
+---
+// The static "lesson" panel showcased in the hero. Content from
+// src/content/lessons/build-an-expression-evaluator/03-evaluating-the-ast/lesson-14.md
+// (Given/When, the "2 + 3 * 4" -> 14 result, and the checkpoint are the lesson's
+// own). For an at-a-glance, no-wrap showcase: the Then is shortened to "the result
+// is 14", and the code hint is condensed from the lesson's `case *Bin:` evaluator
+// (error handling and the - / cases omitted). Highlighting is applied by hand.
+---
+
+<div
+	class="overflow-hidden rounded-card border border-white/10 bg-surface shadow-[0_1px_0_rgba(255,255,255,.02),0_30px_60px_-30px_rgba(0,0,0,.5)]"
+>
+	<!-- window chrome -->
+	<div class="flex items-center gap-3 border-b border-white/10 bg-surface-2 px-4 py-3">
+		<div class="flex gap-[7px]">
+			<span class="h-2.5 w-2.5 rounded-full bg-[#3a3d44]"></span>
+			<span class="h-2.5 w-2.5 rounded-full bg-[#3a3d44]"></span>
+			<span class="h-2.5 w-2.5 rounded-full bg-[#3a3d44]"></span>
+		</div>
+		<span class="font-mono text-xs text-faint">build-an-expression-evaluator / lesson-14.md</span>
+	</div>
+
+	<div class="px-[30px] pt-[26px] pb-7">
+		<div class="mb-[9px] font-mono text-[11.5px] uppercase tracking-[0.12em] text-accent">
+			Lesson 14 · Evaluating the AST
+		</div>
+		<h3 class="mb-[22px] font-display text-[25px] font-semibold tracking-[-0.02em] text-fg">
+			Evaluating the four operators
+		</h3>
+
+		<!-- the spec -->
+		<div class="mb-2 font-mono text-[11px] uppercase tracking-[0.13em] text-faint">The spec</div>
+		<div class="mb-5 rounded-[10px] border border-white/[0.06] border-l-2 border-l-accent bg-well px-4 py-[13px]">
+			<div class="mb-[9px] font-mono text-[11.5px] text-faint">
+				Scenario: <span class="text-code-soft">Arithmetic evaluates through the tree</span>
+			</div>
+			<div class="font-mono text-xs leading-[1.7] text-code-soft">
+				<div><span class="text-code-blue">Given</span> the expression string "2 + 3 * 4"</div>
+				<div><span class="text-code-num">When</span> it is evaluated with EvalString</div>
+				<div><span class="text-code-cyan">Then</span> the result is 14</div>
+			</div>
+		</div>
+
+		<!-- your code -->
+		<div class="mb-[9px] font-mono text-[11px] uppercase tracking-[0.13em] text-faint">Your code</div>
+		<div class="mb-5 overflow-auto rounded-[10px] border border-white/[0.06] bg-well px-4 py-[14px]">
+			<pre class="m-0 font-mono text-xs leading-[1.65] text-code-fg"><span class="text-code-comment">// evaluate both sides, then the operator</span>
+l, r := Eval(n.Left), Eval(n.Right)
+<span class="text-code-blue">switch</span> n.Op &#123;
+<span class="text-code-blue">case</span> <span class="text-code-num">"+"</span>: <span class="text-code-blue">return</span> l + r
+<span class="text-code-blue">case</span> <span class="text-code-num">"*"</span>: <span class="text-code-blue">return</span> l * r
+&#125;<span class="ml-0.5 inline-block h-[15px] w-2 translate-y-[2px] animate-[blink_1.1s_step-end_infinite] bg-code-fg align-[-2px]"></span></pre>
+		</div>
+
+		<!-- further reading -->
+		<div class="mb-[7px] font-mono text-[11px] uppercase tracking-[0.13em] text-faint">Further Reading</div>
+		<p class="mb-5 text-[13px] leading-[1.55] text-muted">
+			Crafting Interpreters, by Robert Nystrom.
+		</p>
+
+		<!-- checkpoint -->
+		<div class="flex items-center gap-[11px] rounded-[10px] border border-check/30 bg-check/10 px-[15px] py-[13px]">
+			<span
+				class="flex h-5 w-5 flex-none items-center justify-center rounded-full border-[1.5px] border-check"
+			>
+				<svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+					<path
+						d="M2.5 6.2 5 8.5 9.5 3.5"
+						stroke="#6FB894"
+						stroke-width="1.6"
+						stroke-linecap="round"
+						stroke-linejoin="round"></path>
+				</svg>
+			</span>
+			<div>
+				<span class="font-display text-[13.5px] font-semibold text-fg">Checkpoint</span>
+				<div class="mt-0.5 text-[12.5px] text-dim">
+					The evaluator computes all four operators. Commit and stop here.
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

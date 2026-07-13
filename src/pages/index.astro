@@ -1,0 +1,117 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import LessonMockup from '../components/LessonMockup.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getAllProjects } from '../data/projects';
+
+const featured = (await getAllProjects()).slice(0, 6);
+const trust = ['Databases', 'Compilers', 'Renderers', 'Emulators'];
+---
+
+<Layout>
+	<div class="w-full overflow-x-hidden">
+		<Nav logoHref="#top" projectsHref="#projects" />
+
+		<!-- ===== HERO ===== -->
+		<header
+			id="top"
+			class="mx-auto max-w-295 px-[clamp(20px,5vw,40px)] pt-[clamp(48px,7vw,74px)] pb-10"
+		>
+			<div
+				class="grid items-center gap-[clamp(36px,4vw,60px)] grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))]"
+			>
+				<!-- left -->
+				<div class="animate-rise">
+					<div
+						class="mb-7 inline-flex items-center gap-2.25 rounded-btn border border-white/[0.14] px-3 py-1.5 font-mono text-xs tracking-[0.02em] text-dim"
+					>
+						<span class="inline-block h-1.5 w-1.5 rounded-full bg-accent"></span>
+						bite-size pieces, twenty minutes a day
+					</div>
+					<h1
+						class="mb-6 font-display text-[clamp(38px,6vw,58px)] font-medium leading-[1.03] tracking-[-0.032em] text-fg"
+					>
+						Large projects in <span class="text-accent">bite-size</span> pieces.
+					</h1>
+					<p class="mb-8.5 max-w-117.5 text-[clamp(16px,2vw,18px)] leading-[1.62] text-muted">
+						The kind of software you would normally treat as a black box — databases,
+						compilers, codecs — written in bite-size pieces. Each lesson is one focused
+						twenty-minute session with a concrete spec to hit, and the pieces add up to something
+						that actually runs.
+					</p>
+					<div class="flex flex-wrap items-center gap-3">
+						<a
+							href="/projects"
+							class="rounded-btn bg-accent px-6 py-3.5 font-display text-[15.5px] font-semibold text-ink transition duration-150 hover:-translate-y-px hover:shadow-[0_10px_26px_rgba(110,155,222,.32)]"
+						>
+							Start Your First Project
+						</a>
+						<a
+							href="/projects"
+							class="rounded-btn border border-white/18 px-5.5 py-3.5 font-display text-[15.5px] font-medium text-fg transition duration-150 hover:border-white/30 hover:bg-white/6"
+						>
+							Browse Projects
+						</a>
+					</div>
+					<p class="mt-6.5 font-mono text-[12.5px] tracking-[0.01em] text-faint">
+						No streaks. No badges. 100% free.
+					</p>
+				</div>
+
+				<!-- right: lesson mockup -->
+				<div class="min-w-0 animate-rise-slow">
+					<LessonMockup />
+				</div>
+			</div>
+
+			<!-- trust strip -->
+			<div
+				class="mt-15 flex flex-wrap items-center gap-[clamp(16px,3vw,36px)] border-t border-white/10 pt-6"
+			>
+				<span class="font-mono text-xs text-faint">
+					// staying grounded in real code in the age of ai
+				</span>
+				{
+					trust.map((label) => (
+						<span class="font-display text-sm font-medium text-dim">{label}</span>
+					))
+				}
+			</div>
+		</header>
+
+		<!-- ===== PROJECTS ===== -->
+		<section
+			id="projects"
+			class="mx-auto max-w-295 px-[clamp(20px,5vw,40px)] pt-20 pb-24"
+		>
+			<div class="mb-9 flex flex-wrap items-baseline justify-between gap-5">
+				<div>
+					<div
+						class="mb-3 font-mono text-xs uppercase tracking-[0.14em] text-accent"
+					>
+						Projects
+					</div>
+					<h2
+						class="font-display text-[clamp(28px,4.5vw,38px)] font-semibold tracking-[-0.028em] text-fg"
+					>
+						Pick something worth building.
+					</h2>
+				</div>
+				<a
+					href="/projects"
+					class="font-display text-[14.5px] font-medium text-accent hover:text-accent-bright"
+				>
+					View all projects →
+				</a>
+			</div>
+
+			<div class="grid gap-5 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
+				{featured.map((project) => <ProjectCard project={project} />)}
+			</div>
+		</section>
+
+		<Footer />
+	</div>
+</Layout>

@@ -1,0 +1,87 @@
+---
+// Layout for the markdown-driven About page (src/pages/about.md).
+// Astro passes the markdown frontmatter as `frontmatter`; the rendered body is <slot />.
+import Layout from './Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+const { frontmatter } = Astro.props;
+---
+
+<Layout
+	title="About - 20minutes.dev"
+	description="Why 20minutes.dev exists, how the projects are built and verified, and the CC0 license."
+>
+	<div class="flex min-h-screen w-full flex-col overflow-x-hidden">
+		<Nav active="about" />
+
+		<!-- ===== HEADER ===== -->
+		<header
+			class="mx-auto w-full max-w-205 px-[clamp(20px,5vw,40px)] pt-[clamp(40px,6vw,72px)] pb-2"
+		>
+			<div class="mb-3 font-mono text-xs uppercase tracking-[0.14em] text-accent">About</div>
+			<h1
+				class="mb-4 font-display text-[clamp(32px,5vw,46px)] font-semibold leading-[1.05] tracking-[-0.03em] text-fg"
+			>
+				{frontmatter.title}
+			</h1>
+			<p class="max-w-140 text-[clamp(15px,1.8vw,17px)] leading-[1.6] text-muted">
+				{frontmatter.intro}
+			</p>
+		</header>
+
+		<!-- ===== BODY (from src/pages/about.md) ===== -->
+		<section
+			class="mx-auto w-full max-w-205 px-[clamp(20px,5vw,40px)] pt-[clamp(28px,4vw,44px)] pb-22.5"
+		>
+			<div class="about-prose">
+				<slot />
+			</div>
+
+			<div
+				class="mt-4 rounded-card border border-white/10 bg-surface px-[clamp(20px,3vw,28px)] py-6 text-center"
+			>
+				<p class="text-[14.5px] leading-[1.6] text-muted">
+					Ready to build something?{' '}
+					<a href="/projects" class="font-semibold text-accent hover:text-accent-bright">
+						Browse the projects →
+					</a>
+				</p>
+			</div>
+		</section>
+
+		<Footer />
+	</div>
+</Layout>
+
+<style>
+	/* Style the markdown body rendered into the slot to match the site's About design.
+	   ## headings become the mono uppercase eyebrows; paragraphs and links are themed. */
+	.about-prose :global(h2) {
+		margin: 40px 0 16px;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		line-height: 1.2;
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+		color: var(--color-faint);
+	}
+	.about-prose :global(h2:first-child) {
+		margin-top: 0;
+	}
+	.about-prose :global(p) {
+		margin: 0 0 16px;
+		max-width: 680px;
+		font-size: 15.5px;
+		line-height: 1.7;
+		color: var(--color-muted);
+	}
+	.about-prose :global(a) {
+		color: var(--color-accent);
+		font-weight: 600;
+		text-decoration: none;
+	}
+	.about-prose :global(a:hover) {
+		color: var(--color-accent-bright);
+	}
+</style>

@@ -1,0 +1,103 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import Syllabus from '../../../components/Syllabus.astro';
+import LessonReader from '../../../components/LessonReader.astro';
+import { getProject, chapterOf } from '../../../data/projects';
+
+export async function getStaticPaths() {
+	const pad = (n: number) => String(n).padStart(2, '0');
+	const lessons = await getCollection('lessons');
+	return lessons.map((lesson) => ({
+		params: { slug: lesson.data.project, lesson: `lesson-${pad(lesson.data.lesson)}` },
+		props: { lesson },
+	}));
+}
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const { lesson } = Astro.props as { lesson: CollectionEntry<'lessons'> };
+const data = lesson.data;
+const project = await getProject(data.project);
+
+// Sibling lessons in this project, for the syllabus links and prev/next.
+const siblings = (await getCollection('lessons'))
+	.filter((l) => l.data.project === data.project)
+	.sort((a, b) => a.data.lesson - b.data.lesson);
+const syllabusLessons = siblings.map((l) => ({
+	lesson: l.data.lesson,
+	title: l.data.title,
+	chapter: chapterOf(l.id, project.parts),
+}));
+const idx = siblings.findIndex((l) => l.id === lesson.id);
+
+const toLink = (l: (typeof siblings)[number]) => ({
+	lesson: l.data.lesson,
+	title: l.data.title,
+	href: `/projects/${project.slug}/lesson-${pad(l.data.lesson)}`,
+});
+const prev = idx > 0 ? toLink(siblings[idx - 1]) : null;
+const next = idx < siblings.length - 1 ? toLink(siblings[idx + 1]) : null;
+
+const { Content } = await render(lesson);
+---
+
+<Layout
+	title={`Lesson ${pad(data.lesson)} · ${data.title} - ${project.title}`}
+	description={data.goal}
+>
+	<div class="flex min-h-screen w-full flex-col overflow-x-hidden">
+		<Nav active="projects" ctaLabel="Continue" ctaHref="#reader" />
+
+		<!-- ===== BREADCRUMB ===== -->
+		<header
+			class="mx-auto w-full max-w-295 px-[clamp(20px,5vw,40px)] pt-[clamp(30px,4vw,48px)] pb-2"
+		>
+			<div class="font-mono text-[12.5px] text-dim">
+				<a href="/projects" class="text-dim hover:text-muted">Projects</a>
+				<span class="text-[#565961]">/</span>
+				<a href={`/projects/${project.slug}`} class="text-dim hover:text-muted">{project.title}</a>
+				<span class="text-[#565961]">/</span>
+				<span class="text-muted">Lesson {pad(data.lesson)}</span>
+			</div>
+		</header>
+
+		<!-- ===== SPLIT: SYLLABUS + READER ===== -->
+		<section class="mx-auto w-full max-w-295 flex-1 px-[clamp(20px,5vw,40px)] pt-6 pb-22.5">
+			<div
+				class="grid grid-cols-1 items-start gap-[clamp(28px,3.5vw,52px)] min-[920px]:grid-cols-[300px_1fr]"
+			>
+				<Syllabus
+					project={project}
+					slug={project.slug}
+					lessons={syllabusLessons}
+					activeLesson={data.lesson}
+				/>
+
+				<div id="reader" class="min-w-0 scroll-mt-22">
+					<LessonReader
+						slug={project.slug}
+						lesson={data.lesson}
+						chapter={chapterOf(lesson.id, project.parts)}
+						title={data.title}
+						overview={data.overview}
+						goal={data.goal}
+						spec={data.spec}
+						code={data.code}
+						reading={data.reading}
+						checkpoint={data.checkpoint}
+						prev={prev}
+						next={next}
+						interactive
+					>
+						<Content />
+					</LessonReader>
+				</div>
+			</div>
+		</section>
+
+		<Footer />
+	</div>
+</Layout>

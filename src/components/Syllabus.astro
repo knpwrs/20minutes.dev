@@ -1,0 +1,176 @@
+---
+import type { Project } from '../data/projects';
+import { COLORS } from '../lib/progress';
+
+interface LessonRef {
+	lesson: number;
+	title: string;
+	chapter: string;
+}
+interface Props {
+	project: Project;
+	slug: string;
+	/** Authored lessons for this project - the syllabus rows are built from these. */
+	lessons: LessonRef[];
+	/** The lesson currently being viewed, highlighted as "you are here". */
+	activeLesson?: number | null;
+}
+
+const { project, slug, lessons, activeLesson = null } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+const firstHref = lessons[0] ? `/projects/${slug}/lesson-${pad(lessons[0].lesson)}` : '#';
+
+// Group the lessons by chapter (derived from their folder, passed in by the page).
+const byChapter = new Map<string, LessonRef[]>();
+for (const lesson of lessons) {
+	const rows = byChapter.get(lesson.chapter) ?? [];
+	rows.push(lesson);
+	byChapter.set(lesson.chapter, rows);
+}
+
+// The server renders a neutral, no-progress skeleton: every lesson is "to do" and
+// no chapter is tagged. Progress lives only in localStorage, so the client script
+// (src/scripts/progress.ts) fills in the done/current markers and the chapter
+// DONE / IN PROGRESS tags after load. Only `activeLesson` - the lesson whose page
+// is being viewed - is honored server-side, so the current page highlights before
+// hydration.
+let cursor = 1;
+const chapters = project.parts.map((part, i) => {
+	const from = cursor;
+	const to = cursor + part.count - 1;
+	cursor = to + 1;
+
+	const rows = (byChapter.get(part.name) ?? [])
+		.slice()
+		.sort((a, b) => a.lesson - b.lesson)
+		.map((h) => {
+			const isActive = h.lesson === activeLesson;
+			return {
+				lesson: h.lesson,
+				lessonPad: pad(h.lesson),
+				title: h.title,
+				isActive,
+				href: `/projects/${slug}/lesson-${pad(h.lesson)}`,
+				color: isActive ? COLORS.rowActive : COLORS.rowTodo,
+				weight: isActive ? 600 : 400,
+			};
+		});
+
+	return {
+		num: pad(i + 1),
+		name: part.name,
+		lessonNums: rows.map((r) => r.lesson),
+		from,
+		to,
+		rows,
+		rest: Math.max(0, part.count - rows.length),
+	};
+});
+---
+
+<aside
+	data-syllabus
+	data-slug={slug}
+	class="min-[920px]:sticky min-[920px]:top-[88px]"
+>
+	<!-- compact progress (hydrated from localStorage by src/scripts/progress.ts) -->
+	<div
+		data-progress
+		data-lessons={project.lessons}
+		class="mb-6 rounded-lg border border-white/10 bg-surface px-3.5 py-3"
+	>
+		<div class="mb-2 flex items-baseline justify-between">
+			<span class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-faint">Progress</span>
+			<span data-progress-count class="font-mono text-[11px] text-dim">0 / {project.lessons} done</span>
+		</div>
+		<div class="mb-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+			<div data-progress-bar class="h-full rounded-full bg-accent" style="width:0%"></div>
+		</div>
+		<div class="flex items-center justify-between gap-2">
+			<a
+				data-continue
+				href={firstHref}
+				class="rounded-btn bg-accent px-3 py-1.5 font-display text-[12.5px] font-semibold text-ink transition duration-150 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(110,155,222,.28)]"
+			>
+				Start
+			</a>
+			<a
+				data-reset
+				href={firstHref}
+				class="font-mono text-[11px] text-faint transition-colors hover:text-muted"
+			>
+				Start over
+			</a>
+		</div>
+	</div>
+
+	<div class="mb-[18px] font-mono text-[11.5px] uppercase tracking-[0.14em] text-faint">Syllabus</div>
+	<div class="flex flex-col gap-[22px]">
+		{
+			chapters.map((c) => (
+				<div data-chapter data-from={c.from} data-to={c.to} data-lessons={c.lessonNums.join(',')}>
+					<div class="mb-2.5 flex items-center gap-2.5">
+						<span data-chap-num class="font-mono text-xs" style={`color:${COLORS.chapNumIdle}`}>
+							{c.num}
+						</span>
+						<span
+							data-chap-name
+							class="flex-1 font-display text-[15px] font-semibold"
+							style={`color:${COLORS.chapNameIdle}`}
+						>
+							{c.name}
+						</span>
+						<span
+							data-chap-tag
+							class="font-mono text-[10.5px] tracking-[0.05em]"
+							style="display:none"
+						/>
+					</div>
+					<div class="ml-[5px] flex flex-col gap-[3px] border-l border-white/10 pl-[22px]">
+						{c.rows.map((r) => {
+							// Neutral "to do" marker; the client swaps in the done/current
+							// marker from localStorage after load.
+							const marker = <span class="block h-[5px] w-[5px] rounded-full bg-[#3a3d44]" />;
+							return (
+								<div
+									data-row
+									data-lesson={r.lesson}
+									data-active={r.isActive ? '' : undefined}
+									class:list={[
+										'-ml-2 flex items-center gap-[9px] rounded-md py-[5px] pl-2',
+										r.isActive && 'bg-white/[0.05]',
+									]}
+								>
+									<span
+										data-marker
+										class="flex h-3.5 w-3.5 flex-none items-center justify-center"
+									>
+										{marker}
+									</span>
+									<span class="min-w-[52px] font-mono text-[11px] text-[#696c74]">Lesson {r.lessonPad}</span>
+									<a
+										data-row-link
+										href={r.href}
+										aria-current={r.isActive ? 'page' : undefined}
+										class="text-[13px] transition-colors hover:text-fg"
+										style={`color:${r.color};font-weight:${r.weight}`}
+									>
+										{r.title}
+									</a>
+								</div>
+							);
+						})}
+						{c.rest > 0 && (
+							<div class="pt-1 pl-[23px] font-mono text-[11px] text-[#565961]">+ {c.rest} more</div>
+						)}
+					</div>
+				</div>
+			))
+		}
+	</div>
+</aside>
+
+<script>
+	// Hydrate the progress card, syllabus, and lesson toggle from localStorage.
+	import '../scripts/progress';
+</script>

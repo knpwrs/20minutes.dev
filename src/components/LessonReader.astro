@@ -1,0 +1,238 @@
+---
+// The lesson "reader" panel. Driven by one lesson's frontmatter; the rendered
+// markdown Background is passed in via the default slot. Shared by the project
+// overview page and the individual lesson pages.
+interface SpecLine {
+	kw: string;
+	text: string;
+}
+interface NavLink {
+	lesson: number;
+	title: string;
+	href: string;
+}
+interface Props {
+	slug: string;
+	lesson: number;
+	chapter: string;
+	title: string;
+	overview?: string;
+	goal: string;
+	spec: { scenario: string; status: 'failing' | 'passing'; lines: SpecLine[] };
+	code: { lang: string; source: string };
+	reading?: string;
+	checkpoint: string;
+	prev?: NavLink | null;
+	next?: NavLink | null;
+	/** Show the localStorage-backed "mark lesson complete" toggle (lesson pages only). */
+	interactive?: boolean;
+}
+
+const { slug, lesson, chapter, title, overview, goal, spec, code, reading, checkpoint, prev = null, next = null, interactive = false } =
+	Astro.props;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const kwColors: Record<string, string> = {
+	Given: '#9bb4cf',
+	When: '#c9b98a',
+	Then: '#8fb4e8',
+	And: '#696c74',
+};
+const specLines = spec.lines.map((l) => ({ ...l, kwColor: kwColors[l.kw] ?? '#9bb4cf' }));
+const codeLines = code.source.replace(/\n+$/, '').split('\n').map((text) => ({
+	text,
+	color: /^\s*(\/\/|#)/.test(text) ? '#7fa98e' : '#d5d8de',
+}));
+
+const failing = spec.status !== 'passing';
+const specAccent = failing ? '#e0917e' : '#6fb894';
+const specLabel = failing ? 'TO DO' : 'DONE';
+---
+
+<div
+	class="overflow-hidden rounded-card border border-white/10 bg-surface shadow-[0_30px_60px_-40px_rgba(0,0,0,.6)]"
+>
+	<!-- window chrome -->
+	<div class="flex items-center gap-3 border-b border-white/10 bg-surface-2 px-[18px] py-[13px]">
+		<div class="flex gap-[7px]">
+			<span class="h-2.5 w-2.5 rounded-full bg-[#3a3d44]"></span>
+			<span class="h-2.5 w-2.5 rounded-full bg-[#3a3d44]"></span>
+			<span class="h-2.5 w-2.5 rounded-full bg-[#3a3d44]"></span>
+		</div>
+		<span class="font-mono text-xs text-faint">{slug} / lesson-{pad(lesson)}.md</span>
+	</div>
+
+	<div class="px-[clamp(24px,3.5vw,48px)] py-[clamp(28px,3.5vw,44px)]">
+		<div class="mb-2.5 font-mono text-xs uppercase tracking-[0.12em] text-accent">
+			Lesson {pad(lesson)} · {chapter}
+		</div>
+		<h2
+			class="mb-5 font-display text-[clamp(26px,3.5vw,34px)] font-semibold tracking-[-0.025em] text-fg"
+		>
+			{title}
+		</h2>
+
+		{
+			overview && (
+				<p class="mb-[30px] max-w-[640px] text-[clamp(15px,1.8vw,17px)] leading-[1.62] text-muted">
+					{overview}
+				</p>
+			)
+		}
+
+		<div class="mb-2 font-mono text-[11.5px] uppercase tracking-[0.13em] text-faint">The goal</div>
+		<p class="mb-7 text-[15.5px] leading-[1.62] text-code-soft">{goal}</p>
+
+		<!-- THE SPEC -->
+		<div class="mb-[11px] flex items-center justify-between gap-3">
+			<div class="font-mono text-[11.5px] uppercase tracking-[0.13em] text-faint">
+				Start here - the target
+			</div>
+			<span
+				class="inline-flex flex-none items-center gap-1.5 rounded-full px-[9px] py-[3px] font-mono text-[10.5px] tracking-[0.08em]"
+				style={`color:${specAccent};border:1px solid ${specAccent}52;background:${specAccent}1a`}
+			>
+				<span class="inline-block h-1.5 w-1.5 rounded-full" style={`background:${specAccent}`}></span>
+				{specLabel}
+			</span>
+		</div>
+		<div
+			class="mb-7 overflow-auto rounded-[10px] border border-white/[0.09] border-l-2 bg-well px-5 py-[18px]"
+			style={`border-left-color:${specAccent}`}
+		>
+			<div class="mb-3 font-mono text-[12.5px] text-faint">
+				Scenario: <span class="text-code-soft">{spec.scenario}</span>
+			</div>
+			<div class="flex flex-col gap-[5px]">
+				{
+					specLines.map((l) => (
+						<div class="pl-3.5 font-mono text-[13px] leading-[1.5]">
+							<span class="inline-block min-w-[52px] font-medium" style={`color:${l.kwColor}`}>
+								{l.kw}
+							</span>
+							<span class="text-code-soft">{l.text}</span>
+						</div>
+					))
+				}
+			</div>
+		</div>
+
+		<!-- BACKGROUND (rendered markdown body) -->
+		<div class="mb-2 font-mono text-[11.5px] uppercase tracking-[0.13em] text-faint">Background</div>
+		<div class="lesson-prose mb-[26px]">
+			<slot />
+		</div>
+
+		<!-- MAKE IT WORK -->
+		<div class="mb-[11px] font-mono text-[11.5px] uppercase tracking-[0.13em] text-faint">
+			Make it work
+		</div>
+		<div class="mb-7 overflow-auto rounded-[10px] border border-white/[0.07] bg-well px-5 py-[18px]">
+			<pre class="m-0 font-mono text-[13px] leading-[1.75]">{
+					codeLines.map((l) => <div style={`color:${l.color}`}>{l.text || ' '}</div>)
+				}</pre>
+		</div>
+
+		{
+			reading && (
+				<>
+					<div class="mb-2 font-mono text-[11.5px] uppercase tracking-[0.13em] text-faint">
+						Further Reading
+					</div>
+					<p class="mb-[30px] text-sm leading-[1.6] text-muted">{reading}</p>
+				</>
+			)
+		}
+
+		<!-- checkpoint -->
+		<div
+			class="mb-8 flex items-center gap-[13px] rounded-[10px] border border-check/30 bg-check/10 px-[18px] py-4"
+		>
+			<span
+				class="flex h-6 w-6 flex-none items-center justify-center rounded-full border-[1.5px] border-check"
+			>
+				<svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+					<path
+						d="M2.5 6.2 5 8.5 9.5 3.5"
+						stroke="#6FB894"
+						stroke-width="1.6"
+						stroke-linecap="round"
+						stroke-linejoin="round"></path>
+				</svg>
+			</span>
+			<div>
+				<div class="flex items-center gap-[9px]">
+					<span class="font-display text-[14.5px] font-semibold text-fg">Checkpoint</span>
+					<span
+						class="rounded-full border border-check/30 px-2 py-0.5 font-mono text-[10.5px] tracking-[0.08em] text-check"
+					>
+						DONE
+					</span>
+				</div>
+				<div class="mt-0.5 text-[13.5px] text-muted-2">{checkpoint}</div>
+			</div>
+		</div>
+
+		{
+			interactive && (
+				<button
+					type="button"
+					data-mark-complete
+					data-slug={slug}
+					data-lesson={lesson}
+					aria-pressed="false"
+					class="mb-8 flex w-full items-center justify-center gap-2.5 rounded-btn border border-white/[0.18] px-4 py-3 font-display text-sm font-semibold text-fg transition duration-150 hover:bg-white/[0.06] data-[complete]:border-check/40 data-[complete]:bg-check/10 data-[complete]:text-check"
+				>
+					<svg
+						data-mark-icon
+						width="15"
+						height="15"
+						viewBox="0 0 12 12"
+						fill="none"
+						aria-hidden="true"
+						class="hidden"
+					>
+						<path
+							d="M2.5 6.2 5 8.5 9.5 3.5"
+							stroke="currentColor"
+							stroke-width="1.6"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+					<span data-mark-label>Mark lesson {pad(lesson)} complete</span>
+				</button>
+			)
+		}
+
+		<!-- prev / next -->
+		<div
+			class="flex items-center justify-between gap-3.5 border-t border-white/10 pt-[22px]"
+		>
+			{
+				prev ? (
+					<a href={prev.href} class="group flex max-w-[48%] flex-col gap-[3px]">
+						<span class="font-mono text-[11px] text-faint">← Previous</span>
+						<span class="truncate font-display text-[14.5px] font-semibold text-muted group-hover:text-fg">
+							Lesson {pad(prev.lesson)} · {prev.title}
+						</span>
+					</a>
+				) : (
+					<span />
+				)
+			}
+			{
+				next ? (
+					<a href={next.href} class="group flex max-w-[48%] flex-col gap-[3px] text-right">
+						<span class="font-mono text-[11px] text-accent">Next →</span>
+						<span class="truncate font-display text-[14.5px] font-semibold text-fg">
+							Lesson {pad(next.lesson)} · {next.title}
+						</span>
+					</a>
+				) : (
+					<span />
+				)
+			}
+		</div>
+	</div>
+</div>
