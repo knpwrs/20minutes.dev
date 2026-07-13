@@ -53,7 +53,12 @@ const projects = defineCollection({
 		size: z.enum(['Small', 'Medium', 'Large']),
 		tech: z.array(z.string()),
 		estMin: z.number().default(20),
-		desc: z.string(),
+		/** One-line card blurb on the projects index. Keep it to ~60-120 chars
+		 * (one clause or two) so it fits a card; the fuller pitch goes in `blurb`.
+		 * Capped so a multi-sentence desc fails the build instead of overflowing. */
+		desc: z.string().max(180),
+		/** Fuller one-or-two-sentence pitch: the project overview page header and
+		 * the page meta description. Longer than `desc` but still tight. */
 		blurb: z.string(),
 		/**
 		 * Orientation shown at the top of the project overview page: what the learner

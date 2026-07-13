@@ -72,7 +72,17 @@ Study one real example before writing anything:
   tags like `B-trees`, `NFA`, `Sockets`, `PPU` — **never a programming language**;
   the language is the learner's choice, so a tech tag naming one contradicts the
   whole premise), `estMin` (always 20),
-  `desc`, `blurb`, **`overview`** (2–4
+  **`desc`** (ONE short sentence, ~60-120 characters: this is the card blurb on
+  the projects index, so it has to fit a card. Active voice naming what you build
+  or do, e.g. "Turn SQL text into answers: tokenize, parse, and execute real
+  queries over tables you build yourself." Do NOT dump the lesson arc here:
+  multi-sentence descs overflow the card, and that is the single most common
+  authoring mistake. The schema caps `desc` at 180 chars, but aim well under,
+  one clause or two),
+  **`blurb`** (a fuller one-or-two-sentence pitch shown on the project overview
+  page header and used as the page meta description; longer than `desc` but still
+  tight),
+  **`overview`** (2–4
   sentence orientation — what the learner builds over the whole run and the end
   result; blank lines separate paragraphs; rendered at the top of the overview
   page as "What you'll build over the next N lessons"). **The overview must set a
