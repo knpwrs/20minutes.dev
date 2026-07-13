@@ -33,11 +33,11 @@ const {
 		>
 			20minutes<span class="text-accent">.dev</span>
 		</a>
-		<div class="flex items-center gap-[clamp(18px,3vw,32px)]">
+		<div class="flex items-center gap-[clamp(14px,3vw,32px)]">
 			<a
 				href={projectsHref}
 				class:list={[
-					'hidden font-display text-[14.5px] font-medium transition-colors hover:text-fg sm:inline',
+					'font-display text-[14.5px] font-medium transition-colors hover:text-fg',
 					active === 'projects' ? 'text-fg' : 'text-muted-2',
 				]}
 			>
@@ -46,7 +46,7 @@ const {
 			<a
 				href="/about"
 				class:list={[
-					'hidden font-display text-[14.5px] font-medium transition-colors hover:text-fg sm:inline',
+					'font-display text-[14.5px] font-medium transition-colors hover:text-fg',
 					active === 'about' ? 'text-fg' : 'text-muted-2',
 				]}
 			>

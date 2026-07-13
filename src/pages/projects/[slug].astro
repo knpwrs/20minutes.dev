@@ -54,7 +54,7 @@ const continueHref = continueLesson ? `/projects/${project.slug}/lesson-${pad(co
 ---
 
 <Layout title={`${project.title} - 20minutes.dev`} description={project.blurb}>
-	<div class="flex min-h-screen w-full flex-col overflow-x-hidden">
+	<div class="flex min-h-screen w-full flex-col overflow-x-clip">
 		<Nav active="projects" ctaLabel="Start" ctaHref={continueHref} ctaTracked />
 
 		<!-- ===== PROJECT HEADER ===== -->
@@ -127,7 +127,10 @@ const continueHref = continueLesson ? `/projects/${project.slug}/lesson-${pad(co
 					activeLesson={readerLesson?.data.lesson ?? null}
 				/>
 
-				<div id="reader" class="min-w-0 scroll-mt-22">
+				<div
+					id="reader"
+					class="min-w-0 scroll-mt-22 min-[920px]:sticky"
+				>
 					{
 						l && Content ? (
 							<LessonReader

@@ -48,7 +48,7 @@ const { Content } = await render(lesson);
 	title={`Lesson ${pad(data.lesson)} · ${data.title} - ${project.title}`}
 	description={data.goal}
 >
-	<div class="flex min-h-screen w-full flex-col overflow-x-hidden">
+	<div class="flex min-h-screen w-full flex-col overflow-x-clip">
 		<Nav active="projects" ctaLabel="Continue" ctaHref="#reader" />
 
 		<!-- ===== BREADCRUMB ===== -->
@@ -76,7 +76,10 @@ const { Content } = await render(lesson);
 					activeLesson={data.lesson}
 				/>
 
-				<div id="reader" class="min-w-0 scroll-mt-22">
+				<div
+					id="reader"
+					class="min-w-0 scroll-mt-22 min-[920px]:sticky"
+				>
 					<LessonReader
 						slug={project.slug}
 						lesson={data.lesson}

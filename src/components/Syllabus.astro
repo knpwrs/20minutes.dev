@@ -71,7 +71,6 @@ const chapters = project.parts.map((part, i) => {
 <aside
 	data-syllabus
 	data-slug={slug}
-	class="min-[920px]:sticky min-[920px]:top-[88px]"
 >
 	<!-- compact progress (hydrated from localStorage by src/scripts/progress.ts) -->
 	<div
@@ -173,4 +172,6 @@ const chapters = project.parts.map((part, i) => {
 <script>
 	// Hydrate the progress card, syllabus, and lesson toggle from localStorage.
 	import '../scripts/progress';
+	// Pin the reader's bottom to the viewport while the syllabus scrolls past it.
+	import '../scripts/sticky-reader';
 </script>
