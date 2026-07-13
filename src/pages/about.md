@@ -6,7 +6,7 @@ intro: 'The kind of software you would normally treat as a black box — databas
 
 ## Why it exists
 
-My name is [Ken Powers](https://knpw.rs), and I built this site because I wanted a way to keep my skills sharp. A small challenge to work through every day sounded right, but I had no desire to grind leetcode puzzles that go nowhere.
+My name is [Ken Powers](https://knpw.rs), and I built this site because I wanted a way to keep my mind sharp. A small challenge to work through every day sounded right, but I had no desire to grind leetcode puzzles that go nowhere.
 
 My original idea was to generate realistic one-off problems to solve on a daily basis. Then it clicked: what if each challenge built on the last, so a few weeks of twenty-minute sessions added up to something real? That is how 20minutes.dev came to be.
 
