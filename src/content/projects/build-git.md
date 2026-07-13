@@ -5,7 +5,7 @@ lessons: 41
 size: 'Medium'
 tech: ['Content-addressable storage', 'Merkle DAG', 'Version control']
 estMin: 20
-desc: 'Build the core of Git from first principles as a content-addressable object database. Start with the loose object format and blobs whose SHA-1 ids match real Git exactly, then build tree objects for directories, a staging index with write-tree, commit objects with parents and a fixed identity, refs and a symbolic HEAD with log, and a simplified status - ending in a working mini-git library whose objects real git cat-file can read.'
+desc: 'Build Git''s core: a content-addressable object store, trees, and commits whose hashes match real git.'
 blurb: 'Every object id you compute matches real Git byte for byte, so you can cross-check with git hash-object and git cat-file at every step. Each lesson is one concrete spec with exact hex ids and byte layouts: the empty blob e69de29, hello.txt hashing to ce013625, a tree that sorts directories as if they end in a slash, a commit that reproduces its exact 40-hex id under a fixed author and timestamp, a symbolic HEAD resolving through a branch ref, and a two-commit log walking child to parent.'
 overview: |
   Over 41 lessons you build the core of Git from first principles: a content-addressable object database in which every object is stored under the SHA-1 hash of its own contents. The remarkable payoff is that the ids you compute match real Git exactly, so at every step you can cross-check your work with git hash-object and git cat-file, and the objects your library writes can be read back by real git.

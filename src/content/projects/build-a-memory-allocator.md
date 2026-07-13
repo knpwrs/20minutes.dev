@@ -5,7 +5,7 @@ lessons: 32
 size: 'Small'
 tech: ['Free lists', 'Coalescing', 'Boundary tags']
 estMin: 20
-desc: 'Build a real memory allocator from first principles over a simulated arena - a single backing byte buffer where every allocation returns a deterministic offset. Start with a bump allocator, add block headers and boundary tags, an explicit free list with splitting and coalescing, first-fit and best-fit policies, realloc and calloc, segregated size-class bins, and a heap-integrity checker - ending in an allocator that runs a scripted workload and reports the exact final heap layout with no corruption, leaks, or overlap.'
+desc: 'Build malloc and free over an arena: free lists, splitting, coalescing, and size-class bins.'
 blurb: 'Model the heap as one byte buffer so malloc, free, and realloc return exact offsets you can assert against - no real pointers, no OS calls. Every lesson is one concrete spec with exact block layouts and free-list states: alignment rounding, splitting a free block, coalescing with the neighbor before, after, and both, first-fit versus best-fit picking different blocks, growing a realloc in place versus relocating it, and detecting a double free.'
 overview: |
   Over 32 lessons you build a working memory allocator from scratch, modelled as a simulated arena: one fixed backing byte buffer where every allocation returns a deterministic offset into it. That design keeps the whole thing exactly testable - real block layouts, real free-list states, real addresses - with no true pointers and no operating-system calls, so the allocator you write is the same in any language.

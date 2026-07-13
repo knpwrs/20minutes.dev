@@ -5,7 +5,7 @@ lessons: 23
 size: 'Small'
 tech: ['Merkle trees', 'Inclusion proofs', 'Content addressing']
 estMin: 20
-desc: 'Build a Merkle tree library from first principles - a tamper-evident data structure where one small root hash fingerprints a whole dataset. Start with a simple deterministic hash and leaf-versus-internal domain separation, build a tree by pairing and hashing hashes up to a single root, detect tampering by comparing roots, generate and verify inclusion (audit) proofs that prove one item belongs without revealing the rest, and finish with append-only consistency proofs and a subtree-walking diff that reports exactly which leaves changed.'
+desc: 'Build a Merkle tree with inclusion proofs, tamper detection, and tree diffing.'
 blurb: 'A Merkle tree turns any list of data into one root hash you can trust: change a single byte anywhere and the root changes. Every lesson is one concrete spec with exact hashes, roots, and proofs. Uses a simple, hand-checkable FNV-1a hash instead of SHA-256 so every leaf hash, internal node, root, and proof is a pinned value you can reproduce - the tree structure is identical for any hash function.'
 overview: |
   Over 23 lessons you build a working Merkle tree library from scratch: a tamper-evident structure that condenses a whole list of data into a single root hash. Change one byte of one item and the root changes; hand someone the root and a short proof and they can confirm an item belongs without seeing the rest of the data. This is the structure behind Git commits, Certificate Transparency logs, Bitcoin blocks, and peer-to-peer file sync.

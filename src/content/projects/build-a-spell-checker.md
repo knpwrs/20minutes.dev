@@ -5,7 +5,7 @@ lessons: 40
 size: 'Medium'
 tech: ['Edit distance', 'BK-trees', 'Candidate generation']
 estMin: 20
-desc: 'Build a real spell checker from first principles: a case-insensitive dictionary, a tokenizer, Levenshtein edit distance, Norvig-style candidate generation, frequency ranking, and a BK-tree index that makes lookups fast - ending in a tool that flags misspellings in a document and suggests ranked corrections.'
+desc: 'Flag misspelled words and rank corrections with edit distance and a BK-tree index.'
 blurb: 'Start with a word set that answers "known or unknown" and end with a runnable checker that reads a paragraph and prints each misspelling with its line, column, and ranked "did you mean" suggestions. Every lesson is one concrete spec: edit distance, deletes/transposes/replaces/inserts, a frequency model, and a metric tree that prunes the search so you never scan the whole dictionary.'
 overview: |
   Over 40 lessons you build a working spell checker from scratch: a case-insensitive dictionary you can query and load from a word list, a tokenizer that splits text into words and remembers where each one sits, Levenshtein edit distance (plus adjacent transposition) as the measure of how far a typo is from a real word, Norvig-style candidate generation that turns a misspelling into the real words one or two edits away, a frequency model that ranks those candidates so the likeliest correction wins, and a BK-tree index whose triangle-inequality pruning finds nearby words without scanning the whole dictionary.

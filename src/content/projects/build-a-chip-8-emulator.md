@@ -5,7 +5,7 @@ lessons: 34
 size: 'Small'
 tech: ['Bytecode interpreters', 'Fetch-decode-execute', 'Sprite rendering']
 estMin: 20
-desc: 'Build a working CHIP-8 interpreter from first principles - the classic 1970s virtual machine that runs games like Pong and Space Invaders as tiny two-byte opcodes. Start with the machine itself (4KB memory, sixteen registers, the index register, program counter, call stack, timers, a 64x32 monochrome framebuffer, and the built-in hex font), build a fetch-decode-execute cycle, then implement the full opcode set one instruction at a time with every carry, borrow, and shift quirk pinned to an exact value, ending in an emulator that loads a real ROM and runs it to completion.'
+desc: 'Emulate CHIP-8: fetch-decode-execute every opcode, draw sprites, and run real ROMs.'
 blurb: 'The whole CPU core is deterministic, so every lesson is one concrete spec with exact register, memory, and framebuffer values: 7XNN adding past 0xFF wraps to 0x00 without touching VF, 8XY4 setting the carry flag after the store even when X is VF, 8XY5 setting VF to 1 when there is no borrow, 8XY6 shifting a bit out into VF, DXYN drawing a sprite by XOR and flagging a collision, and FX33 splitting 254 into the digits 2, 5, 4. Each opcode is a small checkable target you can assert without ever running a graphical program.'
 overview: |
   Over 34 lessons you build a working CHIP-8 emulator from scratch: the interpreter for a tiny 1970s virtual machine whose programs are streams of two-byte opcodes. Because the whole machine is deterministic - 4KB of memory, sixteen 8-bit registers, a 64x32 monochrome screen - every step is exactly testable, so you assert real register and framebuffer values at each lesson rather than eyeballing a running game.

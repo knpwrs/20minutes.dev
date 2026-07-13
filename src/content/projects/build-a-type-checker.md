@@ -5,7 +5,7 @@ lessons: 36
 size: 'Medium'
 tech: ['Type inference', 'Unification', 'Hindley-Milner']
 estMin: 20
-desc: 'Build a real type checker for a small functional language from first principles: a type representation and expression AST, an explicitly-typed checker with environments, let-bindings, functions and conditionals, then the inference core - type variables, unification with the occurs check, substitutions, and Hindley-Milner (Algorithm W) let-polymorphism - finishing with tuples, lists, records, located diagnostics, and a capstone that infers the principal type of a program or reports its type error.'
+desc: 'Infer and check types for a small language with Hindley-Milner and unification.'
 blurb: 'Start with a checker that answers "what type is this?" for literals and end with an inference engine that reads an unannotated program and works out its principal type on its own. Every lesson is one concrete spec: type equality, variable scoping, arrow types, unification, the occurs check that rejects infinite types, generalization so let id = \x.x is polymorphic, and type errors that carry a source location.'
 overview: |
   Over 36 lessons you build a working type checker for a small functional language, from the ground up. You start with a representation of types (Int, Bool, String) and a tiny expression AST, and write a checker that answers "what type is this?" for literals, variables in a typing environment, let-bindings with lexical scope, explicitly-typed functions and application, and conditionals - a complete, usable checker for explicitly-typed programs.

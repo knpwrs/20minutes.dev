@@ -5,7 +5,7 @@ lessons: 45
 size: 'Medium'
 tech: ['B+Trees', 'Paging', 'Copy-on-write']
 estMin: 20
-desc: 'Build an on-disk, crash-safe B+Tree index from first principles: fixed-size pages, a pager, serialized leaf and internal nodes, search, splits, deletes with rebalancing, ordered range scans, a file-backed pager, and copy-on-write commits with a double meta page that survive a crash mid-write.'
+desc: 'Build a crash-safe on-disk B+Tree: paged nodes, splits and merges, and copy-on-write durability.'
 blurb: 'Every node is a fixed-size page from lesson one, so the index genuinely lives on disk and never leans on host pointers or the garbage collector. Grow it one durable piece at a time - pages, nodes, search, splits, deletes, range scans - then move it to a real file and make writes crash-safe with copy-on-write and an atomic double-meta swap. The capstone crashes it mid-write and proves every committed key survived.'
 overview: |
   Over 45 lessons you build a working B+Tree index that lives on disk and survives a crash. From the very first lesson a tree node IS a fixed-size 4096-byte page addressed by an integer page id and reached through a pager (AllocPage, ReadPage, WritePage, FreePage), so nothing ever relies on in-memory pointers or the garbage collector. You serialize leaf and internal nodes to exact bytes, search by descending page to page, insert with leaf and internal splits that keep every leaf at equal depth, delete with borrow-and-merge rebalancing, and answer ordered range scans by walking leaf sibling links.

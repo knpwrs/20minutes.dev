@@ -5,7 +5,7 @@ lessons: 23
 size: 'Small'
 tech: ['LRU eviction', 'LFU eviction', 'Doubly-linked lists']
 estMin: 20
-desc: 'Build two fixed-capacity caches from first principles - an LRU cache and an LFU cache - each with O(1) Get and Put. Start with the cache contract on a plain map, add a doubly-linked list with sentinel head and tail so recency moves are O(1), make a hit promote its entry to the front and eviction remove the tail, then build an LFU cache with a per-frequency list and a minFreq pointer. Add per-entry TTL, runtime resize, and hit/miss stats, and finish by running one scripted workload through both caches to show exactly where least-recently-used and least-frequently-used diverge.'
+desc: 'Build O(1) LRU and LFU caches: a hash map plus a linked list, with TTLs and eviction.'
 blurb: 'Model a cache as a capacity, a Get that counts as a use, and eviction when full - then make every operation O(1). Each lesson pins an exact outcome: the least-recently-used key evicted after a scripted access order, a Get promoting a key so a later Put evicts a different one, an update promoting a key without growing the cache, capacity-1 evicting on every new key, the least-frequently-used key evicted with ties broken by recency, minFreq resetting to 1 on a fresh insert, and a TTL-expired Get missing.'
 overview: |
   Over 23 lessons you build two working caches from scratch - a least-recently-used (LRU) cache and a least-frequently-used (LFU) cache - each a small library with a fixed capacity, a Get and a Put, and O(1) eviction. Keys and values are integers so every step has an exact, assertable outcome: the precise key evicted, the exact hit and miss counts, and the exact remaining contents after a scripted sequence of operations.

@@ -5,7 +5,7 @@ lessons: 22
 size: 'Small'
 tech: ['Cron expressions', 'Scheduling', 'Calendar math']
 estMin: 20
-desc: 'Build a real cron expression parser and scheduler from first principles as an importable library. Split a cron line into its five fields, compile each field to the exact set of values it allows (wildcards, single numbers, lists, ranges, and steps), decode three-letter month and day names, and handle the quirk that both 0 and 7 mean Sunday. Then test whether an explicit timestamp matches an expression - including the classic day-of-month / day-of-week OR rule - and compute the next fire time from a given instant, handling hour and day rollover, end-of-month skipping, and a leap-day February. Every value is deterministic: time is driven by fixed timestamps you pass in, never the wall clock.'
+desc: 'Parse cron expressions and compute the next fire time: fields, ranges, steps, and macros.'
 blurb: 'Parse a five-field cron line into exact value sets so `*/15` on minutes is provably {0, 15, 30, 45}, then match fixed timestamps and compute next fire times you can assert to the minute. Each lesson pins one concrete behavior: a stepped range, JAN meaning 1, both 0 and 7 meaning Sunday, the day-of-month OR day-of-week rule when both are restricted, a next fire that rolls across a month boundary, and a Feb 29 that skips ahead to the next leap year.'
 overview: |
   Over 22 lessons you build a working cron expression parser and scheduler as an importable library, driven entirely by explicit fixed timestamps so every result is deterministic and assertable to the minute. There is no wall clock and no hidden state: you parse an expression once into exact sets of allowed values, then ask two questions of it - does this timestamp match, and when does it next fire.

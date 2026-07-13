@@ -5,7 +5,7 @@ lessons: 34
 size: 'Small'
 tech: ['Subsequence matching', 'Dynamic programming', 'Ranking']
 estMin: 20
-desc: 'Build an fzf-style fuzzy finder from scratch: subsequence matching, a boundary- and consecutive-aware scoring model, an optimal best-match found with dynamic programming, ranking, highlighting, incremental filtering, and an interactive finder over a real corpus.'
+desc: 'Filter and rank a list as you type, fzf-style: subsequence matching with a smart scoring model.'
 blurb: 'Start with a one-line subsequence test and end with a real fuzzy finder that filters a corpus, ranks matches like fzf, highlights where each query character landed, and narrows interactively as you type. Every lesson gives you a concrete spec with exact scores and positions to hit, and the finder grows one honest piece at a time - matching, scoring, an optimal alignment, ranking, and an interactive loop.'
 overview: |
   Over 34 lessons you build a working fuzzy finder in the spirit of fzf. You begin with the core question - does a query fuzzy-match a candidate, character by character, in order - and grow it into a scoring model that rewards consecutive matches, matches at word and path boundaries, and camelCase humps, while penalizing gaps and a slow start. A dynamic-programming pass then finds the highest-scoring alignment (not just any match) and traces back the exact positions, which drive highlighting. From there you rank a whole candidate list, add fzf-style extended query syntax (exact, anchored, and negated terms), and wrap it all in an interactive finder that narrows as you type.

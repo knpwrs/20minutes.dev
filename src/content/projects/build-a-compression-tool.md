@@ -5,7 +5,7 @@ lessons: 33
 size: 'Small'
 tech: ['Huffman coding', 'LZ77', 'Entropy coding']
 estMin: 20
-desc: 'Build a real general-purpose compressor from first principles, organised around one invariant: decompress(compress(x)) must equal x, byte for byte. Start with an MSB-first bit writer and reader that pack codes across byte boundaries, add run-length encoding, canonical Huffman coding, and an LZ77/LZSS sliding-window matcher, then combine the last two into a DEFLATE-lite pipeline with a self-describing container. End with a Compress and Decompress library that round-trips real multi-line text byte-identically, falls back to storing incompressible input without expanding it, and reports the compression ratio.'
+desc: 'Build a compressor from RLE to Huffman to LZ77, proven by exact round-trips.'
 blurb: 'A compressor is only correct if it is exactly reversible, so every lesson pins concrete bytes, tokens, or codes and proves the round trip. Pack bits high-first with a padded final byte, split a run at its maximum encodable length, build a Huffman tree with a deterministic tie-break and derive canonical codes from lengths alone, copy an overlapping LZ77 back-reference byte by byte, and combine Huffman with LZ77 into one container that stores its own method, original length, and code tables.'
 overview: |
   Over 33 lessons you build a working general-purpose compression library from scratch, built around a single promise: decompress(compress(x)) returns exactly x, for every input. That round-trip invariant keeps the whole thing exactly testable - real packed bytes, real token streams, real Huffman codes - and language-neutral, because the codec you write is defined by the bytes it emits, not by any library call.

@@ -5,7 +5,7 @@ lessons: 25
 size: 'Small'
 tech: ['Protocol Buffers', 'Varints', 'Wire formats']
 estMin: 20
-desc: 'Build a real Protocol Buffers codec from the wire format up, decoding raw protobuf bytes into structured fields and encoding them back, with no generated code and no .proto compiler. Start with base-128 varints, then tags and the four wire types, the scalar family (varint ints, zigzag sints, little-endian fixed32 and fixed64, length-delimited strings and bytes), nested messages, repeated and packed fields, and finally a schema-aware decode into named fields with proto3 defaults and preserved unknown fields, ending in a library that round-trips a real message byte for byte.'
+desc: 'Decode and encode the Protocol Buffers wire format: varints, tags, and nested messages.'
 blurb: 'Decode protobuf by hand so every step is an exact byte you can assert against: a varint 150 is 0x96 0x01, a tag for field 1 length-delimited is 0x0A, zigzag maps -1 to 1 and -2 to 3, a fixed32 is four little-endian bytes, a nested message recurses, a packed repeated list unpacks from one length-delimited chunk, an absent field takes its proto3 default, and an unknown field number is preserved as raw wire bytes. Every lesson is one concrete spec with real bytes in and structured values out.'
 overview: |
   Over 25 lessons you build a working Protocol Buffers codec from the wire format up: a library that decodes raw protobuf bytes into structured fields and encodes them back, byte for byte. There is no generated code and no .proto compiler anywhere in the project. You read and write the bytes yourself, so every step is a concrete value you can assert against and the same code works in any language.

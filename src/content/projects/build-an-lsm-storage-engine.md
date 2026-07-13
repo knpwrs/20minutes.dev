@@ -5,7 +5,7 @@ lessons: 40
 size: 'Medium'
 tech: ['LSM tree', 'SSTables', 'Write-ahead log']
 estMin: 20
-desc: 'Build a crash-safe, ordered key-value store on a log-structured merge tree: a fsync''d write-ahead log, immutable SSTables, merged reads, compaction, and recovery that loses nothing committed.'
+desc: 'Build a crash-safe key-value store on an LSM tree: a write-ahead log, SSTables, compaction, and recovery.'
 blurb: 'Start with a sorted in-memory memtable and end with a durable embedded key-value store that survives a crash mid-write. Every lesson gives you a concrete spec to hit, and the engine grows one durable piece at a time - WAL, SSTables, merge iterators, tombstones, compaction, bloom filters.'
 overview: |
   Over 40 lessons you build a working LSM storage engine from scratch: the sorted in-memory memtable that absorbs writes, a write-ahead log that fsyncs every write to disk and replays on open so nothing committed is ever lost, immutable on-disk SSTables with a sparse index, a merge iterator that reads across many files returning the newest value per key, tombstone deletes, leveled compaction, and bloom filters.
