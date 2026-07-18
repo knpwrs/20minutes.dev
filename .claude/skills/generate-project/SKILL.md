@@ -196,7 +196,13 @@ Lessons build on each other, so verification is a **sequential chain over one
 cumulative project** — **one subagent per lesson**, not one agent for the whole
 project and not parallel agents. **Build every lesson, all the way to the end** —
 there is no static-review shortcut; the whole point is to prove the entire arc
-compiles and stays green.
+compiles and stays green. (For a large project — roughly 40+ lessons — a
+**serial, chapter-aligned batch** is an acceptable scale-up: one agent implements
+a contiguous sub-arc in order, re-running the full suite after each lesson and
+returning per-lesson JSON, and you commit per batch. It is still serial and still
+cumulative — just coarser commit granularity. Give each batch agent the next
+chapter's dangerous conventions explicitly so it asserts the trap value, not the
+intuitive-but-wrong one.)
 
 - Create a fresh scratch project directory for the verification language and
   `git init` it. This repo is a deliverable — you'll hand it back for review.

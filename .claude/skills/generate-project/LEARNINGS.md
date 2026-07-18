@@ -1081,3 +1081,142 @@ Prune anything a newer entry contradicts.
   the earlier porcelain lesson's one call site: brief that the sanctioned prior-code change
   ALSO includes an added `SetHEAD` (the HEAD reader had no missing-file tolerance unlike
   the resolver), not just the arg drop.
+
+## AI/ML and network-protocol subjects (LLM, vision, agent harness, codec-over-HTTP)
+
+- **A statistically-defined subject becomes exactly-spec'able by removing the two
+  sources of nondeterminism: random init and data shuffling.** Neural-net TRAINING
+  fits the site if you (a) state every initial weight literally (small round values
+  a `Given` can print), (b) use a fixed literal dataset consumed in order, and (c)
+  use plain SGD with a stated lr - no momentum, no dropout. Then `loss after N steps
+  == 0.0461` is a real, language-neutral, bit-reproducible `Then`. This lets a
+  project go "deterministic DSP/forward-pass first, then graduate to training in the
+  last chapter" without the specs degrading to "loss goes down". Confirm bit-identical
+  output across two independent runs of the precompute reference before authoring.
+- **For a from-scratch scalar-autograd LLM, do NOT promise the capstone writes
+  language.** At teaching scale (a few thousand heap-allocated `Value` nodes, one CPU
+  core) a char model learns letter-frequency statistics and short pattern cycles, not
+  spelling. Measure the real wall-clock-per-step and paste the real generated text
+  before writing the overview; if `"abcdabcd"` in gives `"abcdabcda"` out, that is a
+  cycle detector - say so, and pin the overview to "learns the shape of its training
+  data" not "writes coherent prose". Under-promise; reconcile at finalize.
+- **A CNN taught the older way - backprop DERIVED BY HAND, no autograd engine - is a
+  legitimate deliberate contrast to an autograd LLM built in a sibling project.** Say
+  the overlap is intentional in the overview. The hand-derived chapter's payoff lesson
+  is a NUMERICAL GRADIENT CHECK (central difference, eps 1e-4): it proves every
+  hand-derived backward pass at once, agrees to ~1e-11 relative error, and is the
+  satisfying "it's actually right" beat. Order the backward chain in TRUE REVERSE of
+  the forward pass (loss -> softmax/CE -> dense -> pool -> ReLU -> conv); authoring it
+  forward (ReLU before pool) both breaks continuity AND makes ReLU-backward a vacuous
+  no-op on data where every pooled winner was already positive.
+- **A synthetic classification dataset must have genuinely DISTINCT samples, or
+  "measure accuracy" / "overfit" / "classify a new image" are all vacuous.** A first
+  cut generated the same image per class (8 samples, 2 unique); 100% accuracy and the
+  "held-out" image being pixel-identical to a training one taught nothing. Vary each
+  sample deterministically by index (edge position by `i/2`), reserve a position never
+  trained for the held-out lesson, and REPORT THE REAL confidence (0.74 at the edge of
+  the trained range, not a rigged 0.99). An honest narrow margin is a better lesson.
+- **For a real-API client project (agent harness, HTTP client hitting a named
+  service), target the REAL wire format and make the tests assert against PINNED REAL
+  RESPONSE BYTES served by a local test server** (`httptest`), with the client's base
+  URL configurable from the FIRST network lesson. Never call the live model in a test
+  (it answers differently every run - no value could be pinned) and never invent a
+  wire format (the real one has real, teachable gotchas). Load the provider's own API
+  reference rather than writing the format from memory. Front-load the whole
+  content-block union on lesson 1, and require the union's unused fields to be ABSENT
+  from the wire (omitempty), not present-and-empty - that is a format requirement, not
+  a language quirk, and a byte-exact spec silently depends on it.
+- **NEVER put an unverified error string or HTTP status in a `Then`.** A precompute
+  reference with no network claimed the API "returns 400 with <exact text>" for a
+  malformed request; it cannot have observed that. Teach the REQUIREMENT (every
+  tool_use's result in the next message; all results from one turn in ONE user
+  message) and the structural contrast (correct shape vs the split shape), and say in
+  prose that the exact rejection wording was not verified. Only pin an error response
+  actually seen against the live service.
+- **Real Messages-API gotchas worth a lesson each, all exactly pinnable offline:**
+  parallel `tool_use` -> all `tool_result`s in ONE user message; streamed tool
+  arguments arrive as `input_json_delta` fragments split MID-TOKEN (`{"loca` /
+  `tion": "Par` / `is"}`) that are each invalid JSON alone - buffer per block index,
+  parse once at `content_block_stop`; `pause_turn` resumes by re-sending with the
+  paused assistant turn appended and NO new user message; a `max_tokens` truncation
+  must never be treated as `end_turn`; transcript trimming must drop whole EXCHANGES
+  (a fresh user message with no tool_result starts one) or it orphans a tool_result
+  from its tool_use. A token estimate is a rough `ceil(bytes/4)` on BYTES not runes;
+  name `count_tokens` as the real answer and never mention tiktoken (wrong tokenizer).
+- **Timing/concurrency behaviours are spec'able WITHOUT real time.** Backoff: inject
+  a clock and assert the COMPUTED delay sequence (`[1s, 2s]`; `[5s]` with a
+  retry-after header override), never wall-clock elapsed. Timeout/cancellation: assert
+  the OBSERVABLE outcome (returns a deadline/cancel error AND the side effect did not
+  happen) via an already-expired context; the interesting case is cancelling a
+  request MID-FLIGHT from another goroutine (reached/release channels, deterministic
+  under `-race`). These stay non-flaky and language-neutral.
+- **The `Fn`/handler on a tool type must be front-loaded on the lesson the tool type
+  is BORN, returning `(result, error)`.** A dispatch lesson needs a runnable function
+  to call, and a later "failing tool -> is_error" lesson needs the error channel; both
+  break if the tool started life as wire-fields-only. Same front-load-the-whole-shape
+  rule as SQL statements / protobuf result structs, applied to the executable side of
+  a tool. Once done, the failing-tool lesson "just works" (one-line fix) - the payoff.
+- **Finalize on a real-API client finds bugs the pinned-RESPONSE specs structurally
+  cannot: they only check what comes BACK, never what is SENT.** The agent-harness
+  finalize caught the tool loop never copying the registry's tool DEFINITIONS onto the
+  outgoing request (a live model would never learn a tool existed - the whole agent
+  silently broken) and a non-2xx body unmarshaled into an empty "successful" end_turn
+  reply. Neither is observable when every test feeds a canned response. Add at least
+  one lesson (or a finalize check) that asserts the OUTGOING request bytes carry what
+  the loop should send - tools on every turn, the system prompt, cache markers - not
+  just that those fields serialize correctly in isolation. Live-smoke the finished
+  binary (build, no-key fast-fail, usage) yourself; document that "never run against a
+  real key" honestly in caveats when no key is available.
+- **When authoring is fanned out but VERIFICATION must be serial, still author each
+  chapter against the REAL committed text of the previous chapter, not the plan.**
+  Parallel per-chapter authoring makes chapter N guess the exact type shapes chapter
+  N-1 built, which is precisely how front-load/continuity gaps get created (the
+  dispatch-needs-a-handler gap surfaced this way). One agent per lesson for
+  verification, committing after each returns, keeps per-lesson commit history clean;
+  batching two lessons whose code lands in the SAME file collapses them into one
+  commit (their diffs can't be cleanly split without a commit between them).
+- **A precompute reference's trivial convenience helpers (`Neg`, `Sub`, public
+  wrappers like `Topo`) will get referenced by later lessons as "already built in
+  chapter 1" even when NO lesson ever introduced them** - because the reference has
+  them for free and the author reads the reference, not the lesson arc. This is the
+  most common continuity gap in a compose-heavy LIBRARY, and every verifier flags it
+  as `missing_prereq`/`continuity_ok:false`. Fix at planning time: list every helper
+  the reference exposes and assign each a home - either a lesson whose spec builds it,
+  or the earliest lesson that USES it (introduce it there as a one-line composition:
+  `Sub(a,b)=Add(a,Mul(b,-1))`). A lesson may only say "already built" if an earlier
+  lesson's spec actually built it. The public entry-point wrapper counts too: if L5
+  calls `Topo(v)`, L4 must SHOW `Topo`, not just the private recursive helper.
+- **Pinned deterministic-weight formulas must appear as literal arithmetic in the
+  Given at EVERY use site - never reference a named generator from the reference's
+  source.** One lesson said `pinnedWideMatrix(seed=16, scale=0.1)`; that name exists
+  only in the Go reference, so a learner (with no shared codebase) cannot reproduce
+  it, and a second lesson used a DIFFERENT formula under a similar name, so the name
+  is ambiguous. Every other lesson correctly spelled out `(((row*5+col*11+seed*13) mod
+  7) - 3) * 0.1`. Rule: the lesson text is the learner's ONLY source of truth, so any
+  pinned matrix/table is stated as reproducible arithmetic matching the convention of
+  the lesson that introduced that formula.
+- **Reordering a payoff lesson BEFORE the constraint that changes its numbers forces
+  you to invent a value the reference never computes - unless you anchor on the
+  invariant sub-case.** Softmax and weighted-sum were placed before causal masking; a
+  naive spec would need "unmasked" attention weights the masked reference never prints.
+  Fix: assert those pre-constraint lessons on the LAST row of the sequence, which
+  legally attends to everything, so masking is a no-op there and the numbers are real
+  reference values - and say so in prose. Generalizes: when lesson K precedes a later
+  constraint, pin K on the sub-case where that constraint does nothing.
+- **Zero-diff composition/payoff beats are EXPECTED and correct in an autograd/tensor
+  library and will be flagged `too_small` by the scope proxy - pre-declare them to
+  verifiers so they aren't "fixed" by padding.** In the LLM, gradient-accumulation
+  (works the day the first shared-input graph is built), `Linear` (MatMul+bias),
+  softmax-the-scores (reuses SoftmaxRow), and the second attention head (same
+  constructor, new seeds) each added ~zero production lines. That is the "it just
+  works" reward of composing tested pieces; the lesson's job there is the insight and
+  the new pinned values it asserts, not new code. Brief verifiers that a zero/near-zero
+  diff is the intended outcome for named payoff lessons.
+- **For a 40+ lesson library, chapter-aligned serial verification batches (one agent
+  per sub-arc, full suite re-run after each lesson, commit per batch) are a sound
+  scale-up of the one-agent-per-lesson rule** - they keep continuity honest (each
+  batch builds on the prior committed batch) while cutting orchestration cost, at the
+  price of per-batch (not per-lesson) commit granularity. Give each batch agent the
+  next chapter's dangerous conventions explicitly (the biased-variance ÷N trap, the
+  Q/K/V-distinct requirement, the -Inf-before-softmax masking) so it asserts the trap,
+  not the intuitive-but-wrong value.
